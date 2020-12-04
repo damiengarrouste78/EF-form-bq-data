@@ -1,4 +1,12 @@
-﻿-- 1
+﻿--======================================================================================================================
+-- Formation BigQuery 
+-- EPSILON FRANCE damien.garrouste@epsilon-france.com
+-- with clause
+-- 10/2020
+--======================================================================================================================
+
+
+-- 1
 -- WITH SOUS REQUETE
 
 create table instacart.orders_scope as 
@@ -14,31 +22,57 @@ on ss.user_id=orders.user_id
 
 -- countif ne marche pas booleen ????
 --Select 
---COUNTIF(order_dow in unnest([0,6]), 1, 0) AS nb_we
+--COUNTIF(order_dow in unnest([1,7]), 1, 0) AS nb_we
 --FROM instacart.orders_scope
 --;
 
 -- ca ca marche
-Select 
-case when order_dow in unnest([0,6]) then 1 else 0 end as weekend,
-COUNT(1)
-FROM instacart.orders_scope
-where order_dow in unnest([0,6])
-group by weekend
-;
- -- 2 -- Les parametres dans le with pour la lisibilité
+-- Select 
+-- case when order_dow in unnest([1,7]) then 1 else 0 end as weekend,
+-- COUNT(1)
+-- FROM instacart.orders_scope
+-- where order_dow in unnest([1,7])
+-- group by weekend
+-- ;
+
+-- 2
+-- Les parametres dans le with pour la lisibilité
 -- array donc entre []
+
+create temporary table orders_we as
 WITH PARAMS AS (
-  SELECT [0,6] AS WEEKEND_DAYS,
-  [7,8,9,10] AS MORNING_TH
+  SELECT [1,7] AS WEEKEND_DAYS,
+  [6,7,8] AS MORNING_TH
 )
 -- la requete
 SELECT 
   case when order_dow in unnest(WEEKEND_DAYS) then 1 else 0 end as weekend,
   case when order_hour_of_day in unnest(MORNING_TH) then 1 else 0 end as morning,
-COUNT(1)
-FROM instacart.orders_scope
-group by weekend,morning ;   -- autre exemple SELECT CAST("2017-06-01 00:00:00" AS TIMESTAMP) as date_deb;
+COUNT(1) as nb_orders
+FROM instacart.orders_scope,PARAMS
+group by weekend,morning
+;
+
+--- 
+--- On en profite pour montrer les window function pour calculer la somme sur weekend et semaine
+--- 
+select weekend, morning,nb_orders as orders,
+SUM(nb_orders) OVER(PARTITION BY weekend) as orders_we
+from  orders_we
+;
+--- pour calculer le ration il faut passer en sous requete
+SELECT weekend, morning,orders,orders_we as orders_soustotal, round(orders/orders_we*100) as ratio_morning
+from  
+(
+select weekend, morning,nb_orders as orders,
+SUM(nb_orders) OVER(PARTITION BY weekend) as orders_we
+from  orders_we
+) as sous_req
+;
+
+-------------------------------------------------------------------------------
+-- autre exemple WITH
+SELECT CAST("2017-06-01 00:00:00" AS TIMESTAMP) as date_deb;
 
 WITH PARAMS AS (
 SELECT CAST("2017-06-01 00:00:00" AS TIMESTAMP) as date_deb
