@@ -54,7 +54,7 @@ SET EXPERIENCE = 10;
 -- Formule revenu  = constante + pente * (coef)
 -- EXECUTE IMMEDIATE provoque lexec live , ainsi le resultat est dispo dans les instructions suivantes
 -- les variables declarees sont nommees avec @ et on peut en utilise avec using et ?
-EXECUTE IMMEDIATE "SELECT @constante + @pente  * @EXPERIENCE" INTO revenu USING constante as constante, pente as pente, EXPERIENCE as EXPERIENCE ;
+EXECUTE IMMEDIATE "SELECT @const + @pente  * @EXPERIENCE" INTO revenu USING constante as const, pente as pente, EXPERIENCE as EXPERIENCE ;
 
 -- on ne peut pas melanger les? et @
 EXECUTE IMMEDIATE "SELECT ? + ? * ?" INTO revenu USING 30000,1500,10;
