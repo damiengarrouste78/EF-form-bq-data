@@ -1,9 +1,9 @@
 --======================================================================================================================
 -- Formation BigQuery 
--- script, proce stocké, 
+-- script, proce stockï¿½, 
 -- 10/2020
 --======================================================================================================================
-
+--test222
 ------------------------------------------------------------------------------------------------------------------------
 -- 1 SCRIPT SIMPLE
 -- Declarer une variable pour stocker des noms de stations dans un array
@@ -34,13 +34,13 @@ WHERE start_station_name IN UNNEST(top_stations)
 AND start_date >date_deb
 GROUP BY start_station_name
 ;
--- PS : pour que la variable top stations soit connu il faut éxécuter en meme temps les statements
+-- PS : pour que la variable top stations soit connu il faut ï¿½xï¿½cuter en meme temps les statements
 END;
 ------------------------------------------------------------------------------------------------------------------------
 -- 2 SCRIPT QUI GENERE DU CODE
--- Soit un script qui applique une combinaison linéaire du type revenu = constante + pente x nb annee exp 
+-- Soit un script qui applique une combinaison linï¿½aire du type revenu = constante + pente x nb annee exp 
 BEGIN
--- DECLARE au début
+-- DECLARE au dï¿½but
 DECLARE constante INT64;
 DECLARE pente INT64;
 DECLARE revenu FLOAT64;
