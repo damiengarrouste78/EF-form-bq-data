@@ -161,7 +161,7 @@ bq query \
 
 bq query \
 --use_legacy_sql=false \
---parameter='liste_stations:STRUCT<x STRING, y STRING>:("PARK LANE , HYDE PARK","1"), ("PARK LANE , HYDE PARK","2")' \
+--parameter='liste_stations:STRUCT<x STRING, y STRING>:("PARK LANE , HYDE PARK","1"), (""HYDE PARK CORNER , HYDE PARK","2")' \
  '
  SELECT *
 FROM eu_dgr.public_london_cycle_hire

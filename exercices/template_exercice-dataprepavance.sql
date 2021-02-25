@@ -180,6 +180,11 @@ order by size
 ------------------------------------------------------------------------------------------------------------------------
 
 -- 1/ Au sein de chaque département, donner le top 3 des produits par nombre de commande
+SELECT
+qry.*
+from
+(
+
 	select 
 		department,
 		product_name, 
@@ -197,8 +202,10 @@ order by size
 		group by department, product_name 
     ) 
      order by department, rk
-		LIMIT ?
+) as qry
+where qry.rk<=3
 ;
+
 
 ------------------------------------------------------------------------------------------------------------------------
 -- EXERCICE 5
@@ -260,11 +267,11 @@ left join instacart.departments as c on b.department_id = c.department_id
 
 -- le script  pivot est une procedure stocke 
 --- la proc stck pivot genère une chaine sql qui est ensuite execute 
-CALL eu_dgr.pivot(
+CALL instacart.pivot(
   'instacart.users_commandes' # source table
   , 'instacart.users_nb_commandes' # destination table
   , ['user_id'] # row_ids
-  , 'department' # pivot_col_name
+  , 'departement' # pivot_col_name
   , 'commande' # pivot_col_value
   , 30 # max_columns
   , 'SUM' # aggregation

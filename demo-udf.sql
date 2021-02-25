@@ -8,6 +8,14 @@
 -- fonction qui associe à un dayof week le jour en français
 -- on cree un array de jour en francais et on extrait à tout x timestamp, on extrait le jour de la semaine et on extrailordonne sachant que le 1 signifie sunday! (et pas lundi!!
 -- ORDINAL attend un indice commencant à 1 contrairement à OFFSET qui commence à0 )
+
+-- test
+select ['dimanche','lundi','mardi'][ORDINAL(1)] 
+;
+
+select ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'][ORDINAL(EXTRACT(DAYOFWEEK from CAST("2017-01-01 00:00:00" AS TIMESTAMP)))] 
+;
+
 CREATE TEMPORARY FUNCTION dowInFrench(x TIMESTAMP) AS
 (
 ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][ORDINAL(EXTRACT(DAYOFWEEK from x))]

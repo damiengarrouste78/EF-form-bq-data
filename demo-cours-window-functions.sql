@@ -62,14 +62,15 @@ VALUES('Andriy Hovorov','50m',21.74),
 SELECT 
 nageur, epreuve, temps, 
 RANK() OVER(PARTITION BY epreuve ORDER BY temps) as Rang 
-FROM Neu_dgr.nage_jo 
+FROM eu_dgr.nage_jo 
 
 -- percentiles 
 SELECT DISTINCT Temps, Q1, MED, Q3
 FROM 
 ( SELECT 
-Nom, Épreuve, Temps, 
-PERCENTILE_CONT(Temps, 0,25) OVER(PARTITION BY Épreuve) as Q1
-PERCENTILE_CONT(Temps, 0,50) OVER(PARTITION BY Épreuve) as MED
-PERCENTILE_CONT(Temps, 0,75) OVER(PARTITION BY Épreuve) as Q3
-  FROM Nage_Libre_M_JO_2016 )
+nageur, epreuve, temps, 
+PERCENTILE_CONT(Temps, 0.25) OVER(PARTITION BY epreuve) as Q1,
+PERCENTILE_CONT(Temps, 0.50) OVER(PARTITION BY epreuve) as MED,
+PERCENTILE_CONT(Temps, 0.75) OVER(PARTITION BY epreuve) as Q3
+FROM eu_dgr.nage_jo)
+;
