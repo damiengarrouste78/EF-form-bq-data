@@ -111,6 +111,10 @@ bq query \
 -- paramètre sous forme de liste : la liste doit etre exprimé sous forme de STRUCT
 
 -- On teste la requete d'abord pour comprendre comment on eput utiliser une liste array dans un where
+-- la liste contien deux noms de stations qui sont dans un array
+select ["PARK LANE , HYDE PARK","HYDE PARK CORNER, HYDE PARK"];
+SELECT * FROM UNNEST(["PARK LANE , HYDE PARK","HYDE PARK CORNER, HYDE PARK"]) 
+
 SELECT 
       start_station_name
       , AVG(duration) as avg_duration
@@ -122,11 +126,12 @@ SELECT
     GROUP BY start_station_name
 ;
 
--- mais c un struct le parametre donc testons manip struct
+
+-- On va passer la liste de stations en parametre comme un struct, passons d'abord en parametre avec la clause with
 --https://stackoverflow.com/questions/44812619/in-biqquery-how-to-filter-an-array-of-struct-on-matching-multiple-fields-in-the
 WITH data AS (
   SELECT 
-  [STRUCT<x STRING, y STRING>("PARK LANE , HYDE PARK","1"), ("PARK LANE , HYDE PARK","2")]
+  [STRUCT<x STRING, y STRING>("PARK LANE , HYDE PARK","station 1"), ("PARK LANE , HYDE PARK","station 2")]
   # bien mettre des [ ] pour que ce soit un array de struct
   AS SOURCE)
 SELECT *
@@ -134,17 +139,20 @@ FROM data
 WHERE EXISTS (
   SELECT 1 FROM UNNEST(source) AS s 
 )
+;
 -- La requete avec un array de STRUCT 
 SELECT 
+      s.y,
       start_station_name
       , AVG(duration) as avg_duration
     FROM 
-      eu_dgr.public_london_cycle_hire, UNNEST( [STRUCT<x STRING, y STRING>("PARK LANE , HYDE PARK","1"), ("HYDE PARK CORNER, HYDE PARK","2")]) as s
+      eu_dgr.public_london_cycle_hire, UNNEST( [STRUCT<x STRING, y STRING>("PARK LANE , HYDE PARK","station 1"), ("HYDE PARK CORNER, HYDE PARK","station 2")]) as s
     WHERE s.x=UPPER(start_station_name)	
 	  AND start_date >"2017-06-01 00:00:00"
-    GROUP BY start_station_name
+    GROUP BY s.y,start_station_name
 ;
--- on parametre
+
+-- on parametre, on teste dabord sans passer le parametre
 bq query \
 --use_legacy_sql=false \
 --parameter='liste_stations:STRUCT<x STRING, y STRING>:{"x":"PARK LANE , HYDE PARK", "y": "HYDE PARK CORNER, HYDE PARK"}' \
@@ -159,12 +167,16 @@ bq query \
    '
 
 
+   -- on parametre, 
 bq query \
 --use_legacy_sql=false \
---parameter='liste_stations:STRUCT<x STRING, y STRING>:("PARK LANE , HYDE PARK","1"), (""HYDE PARK CORNER , HYDE PARK","2")' \
- '
- SELECT *
-FROM eu_dgr.public_london_cycle_hire
-WHERE UPPER(start_station_name) IN (
-  SELECT 1 FROM UNNEST(@liste_stations) 
-)'
+--parameter='liste_stations:STRUCT<x STRING, y STRING>:{"x":"PARK LANE , HYDE PARK", "y": "HYDE PARK CORNER, HYDE PARK"}' \
+'SELECT 
+      start_station_name
+      , AVG(duration) as avg_duration
+    FROM 
+      eu_dgr.public_london_cycle_hire, UNNEST( [@liste_stations]) as s
+    WHERE s.x=UPPER(start_station_name)
+	AND start_date >"2017-06-01 00:00:00"
+    GROUP BY start_station_name
+   '

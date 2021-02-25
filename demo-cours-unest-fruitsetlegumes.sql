@@ -12,11 +12,12 @@
 -- on veut générer deux lignes de données donc on met en array devant le struct contient deux lignes de données
 
 
--- sans le array au debut : cela cree deux colonnes
+
+-- sans le array au debut : cela cree deux colonnes et une seule ligne
 select STRUCT<panier STRING, produits ARRAY<STRING>>
 ('fruits',['pomme','poire','banane']),('legumes',['haricots','champignons'])
 ;
--- avec le array au debut : cela cree une ligne car un seul array
+-- avec le array au debut : cela cree une ligne car un seul array qui contient le struct
 select [STRUCT<panier STRING, produits ARRAY<STRING>>
 ('fruits',['pomme','poire','banane']),('legumes',['haricots','champignons'])]
 ;
@@ -30,7 +31,7 @@ select [STRUCT<panier STRING, produits ARRAY<STRING>>
 
 
 
--- commeles données sont un array on doit passer un unnest , en sortie cela cree deux lignes
+-- commeles données sont un array on doit passer un unnest si on veut generer des lignes, en sortie cela cree deux lignes
 create or replace table eu_dgr.paniers as
 select expanded.produits, expanded.panier
 from eu_dgr.mon_struct as t0
