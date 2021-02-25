@@ -7,12 +7,12 @@
 -- on regarde quels mois il y a en 2017
 
 
-select EXTRACT(YEAR FROM start_date) as annee,EXTRACT(MONTH FROM start_date) as mois,count(*)
-from eu_dgr.public_london_cycle_hire
-WHERE DATE(start_date) > DATE '2017-01-01'
+--select EXTRACT(YEAR FROM start_date) as annee,EXTRACT(MONTH FROM start_date) as mois,count(*)
+--from eu_dgr.public_london_cycle_hire
+--WHERE DATE(start_date) > DATE '2017-01-01'
 --where substr(cast(rental_id as string),7,2)='00'
-group by  1,2
-order by 1,2
+--group by  1,2
+--order by 1,2
 ;
 -- 438 k lignes en juin 2017 dernier mois
 -- MODEL M1
