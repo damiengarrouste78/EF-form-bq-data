@@ -4,7 +4,9 @@
 -- 10/2020
 --======================================================================================================================
 
-
+-------------
+PARTIE 1 LONDON hires
+-------------
 -- flag week et matin : est ce qu'il y a plus de locations en matinée en semaine ?
 create temporary table hires_wemorning as
 WITH PARAMS AS (
@@ -36,7 +38,8 @@ order by flag_weekend, flag_morning
 ;
 
 -------------
-
+PARTIE  2 JEUX OLYMPIQUES
+-------------
 
 create or replace table eu_dgr.nage_jo(nageur STRING,epreuve STRING,temps FLOAT64);
 INSERT eu_dgr.nage_jo (nageur,epreuve,temps)
@@ -55,7 +58,8 @@ VALUES('Andriy Hovorov','50m',21.74),
 ('Nathan Adrian','100m',47.85),
 ('Pieter Timmers','100m',47.8),
 ('Santo Condorelli','100m',47.88),
-('Simonas Bilis','50m',22.08);
+('Simonas Bilis','50m',22.08)
+;
 
 
 -- Classement (fonction rank ) par temps (order by) et par epreuve (partition)
@@ -63,9 +67,9 @@ SELECT
 nageur, epreuve, temps, 
 RANK() OVER(PARTITION BY epreuve ORDER BY temps) as Rang 
 FROM eu_dgr.nage_jo 
-
+;
 -- percentiles 
-SELECT DISTINCT Temps, Q1, MED, Q3
+SELECT DISTINCT epreuve, Q1, MED, Q3
 FROM 
 ( SELECT 
 nageur, epreuve, temps, 
