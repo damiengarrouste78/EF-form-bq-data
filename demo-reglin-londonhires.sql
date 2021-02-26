@@ -76,7 +76,6 @@ WHERE DATE(start_date) >  date_deb
 ;
 
 
-
 -- les metriques descendent MAE 778 etmedian 401
 SELECT * FROM ML.WEIGHTS(MODEL eu_dgr.bicycle_model_linear_m2);
 
@@ -120,6 +119,14 @@ SELECT  duration,  start_station_name,  start_date
 FROM   eu_dgr.public_london_cycle_hire
 WHERE DATE(start_date) >  date_deb
 ;
+
+
+SELECT * FROM ML.PREDICT(MODEL eu_dgr.model_bucketized,(
+  SELECT
+  'Vauxhall Cross, Vauxhall' AS start_station_name
+  ,cast('2015-01-31 09:30:00' as TIMESTAMP) AS start_date)
+)
+
 -- MODEL M4 
 -- AJOUTONS DES TRANSFORMATIONS sur station name :on prend sa position hashée dans un espace reduit
 CREATE OR REPLACE MODEL eu_dgr.model_fc_geo
@@ -143,7 +150,8 @@ ON cycle_hire.start_station_id = cycle_stations.id
 WHERE DATE(start_date) >  date_deb
 
 ;
-
+SELECT * FROM ML.WEIGHTS(MODEL eu_dgr.model_fc_geo)
+;
 
 -- MODEL CLASSIFICATION
 -- Calcul du taux de cible
