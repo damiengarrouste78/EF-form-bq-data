@@ -48,7 +48,7 @@
 	
 	
 --3/ créer les tables correspondant au périmètre (les cclients et leurs commandes présents dans le fichier train)
-create table instacart.orders_scope as 
+create table XXXX.orders_scope as 
 select *
 from instacart.orders
 where user_id in 
@@ -58,7 +58,7 @@ where eval_set = 'train')
 ; 
 
 -- équivalent avec WITH CLAUSE (pas plus rapide car stages identiques)
--- create table instacart.orders_scope as 
+-- create table XXXX.orders_scope as 
 -- with sous_req as (
 -- select distinct user_id
 -- from instacart.orders
@@ -70,7 +70,7 @@ where eval_set = 'train')
 ; 
 
 -- : Ne garder que les lignes de commandes des clients du train set : 
-create table instacart.orders_products_scope as 
+create table XXXX.orders_products_scope as 
 select a.*
 from instacart.order_products_train as a
 inner join instacart.orders_scope as b on a.order_id = b.order_id
@@ -85,7 +85,7 @@ inner join instacart.orders_scope as d on c.order_id = d.order_id
 -- on peut pas passer le clustering en ui https://cloud.google.com/bigquery/docs/creating-clustered-tables#console_1
 bq query --use_legacy_sql=false \
 'CREATE TABLE
-   instacart.orders_products_scope2
+   XXXX.orders_products_scope2
  CLUSTER BY
    order_id,product_id AS
  SELECT
@@ -107,7 +107,7 @@ drop table if exists instacart.orders_products_scope;
 -- Créer une table orders_products en ‘applatissant’ l’array details de la table orders_struct 
 -- STRUCTURE DES DONNEES
 -- Transformer la table des commandes et des lignes de commandes en un json avec imbrication 
-create table instacart.orders_struct as 
+create table XXXX.orders_struct as 
 select 
 a.order_id,
 a.user_id, 
@@ -127,12 +127,12 @@ group by a.order_id, a.user_id, a.eval_set, a.order_number, a.order_dow, a.order
 
 -----------------------------------------------------
 -- Remplacer les ? par les bonnes instructions !!!!
-create table instacart.orders_products as
+create table XXXX.orders_products as
 select 
 	order_id, user_id, eval_set, order_number, order_dow, order_hour_of_day, days_since_prior_order, 
-	?
+	details.product_id, details.add_to_cart_order, details.reordered
 from instacart.orders_struct
-cross join ? as details 
+cross join ?(details) as details 
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ where qry.rk<=3
 -- (la version complète permet de créer la source du Use Case Segmentation
 --  exporté : gs://epsi-tech-dsc-formation-202005/data/instacart/user_classes.csv)
 
-create table instacart.users as 
+create table XXXX.users as 
 select 
 	count(distinct case when department = 'frozen' 				then order_id end) as nb_commandes_frozen,
   	count(distinct case when department = 'bakery' 				then order_id end) as nb_commandes_bakery,
@@ -256,7 +256,7 @@ group by user_id
 
 
 -- et si dans les values il y a des espaces cela fait un bugge car la variable cree nest pas correcte d'ou le replace
-create or replace table instacart.users_commandes as 
+create or replace table XXXX.users_commandes as 
 select 
 distinct user_id,order_id, replace(department,' ','_') as departement,1 as commande
 from instacart.orders_products as a
@@ -267,7 +267,7 @@ left join instacart.departments as c on b.department_id = c.department_id
 
 -- le script  pivot est une procedure stocke 
 --- la proc stck pivot genère une chaine sql qui est ensuite execute 
-CALL instacart.pivot(
+CALL XXXX.pivot(
   'instacart.users_commandes' # source table
   , 'instacart.users_nb_commandes' # destination table
   , ['user_id'] # row_ids
@@ -326,11 +326,28 @@ union all
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ------------------------------------------------------------------------------------------------------------------------
 -- EXERCICE 6 corrigé sur tous les univers
 ------------------------------------------------------------------------------------------------------------------------
 
-create or replace table instacart.quantiles as
+create or replace table XXXX.quantiles as
 	select distinct 'frozen' as department, cut_1, cut_2, cut_3
 	from 
 		(
@@ -537,7 +554,7 @@ union all
 -- EXERCICE 7 corrigé sur tous les univers
 ------------------------------------------------------------------------------------------------------------------------
 
-create table instacart.users_classes as 
+create table XXXX.users_classes as 
 select 
 
   user_id,
