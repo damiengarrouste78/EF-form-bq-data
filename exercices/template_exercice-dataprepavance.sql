@@ -268,8 +268,8 @@ left join instacart.departments as c on b.department_id = c.department_id
 -- le script  pivot est une procedure stocke 
 --- la proc stck pivot genère une chaine sql qui est ensuite execute 
 CALL XXXX.pivot(
-  'instacart.users_commandes' # source table
-  , 'instacart.users_nb_commandes' # destination table
+  'XXXX.users_commandes' # source table
+  , 'XXXX.users_nb_commandes' # destination table
   , ['user_id'] # row_ids
   , 'departement' # pivot_col_name
   , 'commande' # pivot_col_value

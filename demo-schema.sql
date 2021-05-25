@@ -1,5 +1,7 @@
 -- Commande pour générer un schéma et lexporter
-bq show --format prettyjson --schema ch04.college_scorecard > schema.json
+bq show --format prettyjson --schema instacart.aisles > schema.json
+
+
 -- en SQL
 SELECT 
  TO_JSON_STRING(
