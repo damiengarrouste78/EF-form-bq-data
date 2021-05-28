@@ -1,4 +1,5 @@
--- Commande pour générer un schéma et lexporter
+-- SchÃ©ma pour importer une table dans BQ
+-- Commande pour gï¿½nï¿½rer un schï¿½ma et lexporter
 bq show --format prettyjson --schema instacart.aisles > schema.json
 
 
