@@ -2,8 +2,11 @@
 -- Formation BigQuery 
 -- requetes paramétrées
 -- 10/2020
--- Exemple google
+
 --======================================================================================================================
+
+-- Comment passer des paramètres qui ne sont pas écrits dans le programme à l’exec d'une requete 
+
 
 -- 1/ -- Tester  requete sans parametres
 -- détails https://cloud.google.com/bigquery/docs/parameterized-queries#bq
@@ -21,7 +24,8 @@ SELECT
     GROUP BY start_station_name
 	
 
--- 1'/ -- écrire la requete avec la convention with parametres au debut
+-- 1'/ -- Rappel on peut écrire la requete avec la convention with où on encapsule les "paramètres" au debut
+-- voir également la démo script pour déclarer le parametre commeune variable
 
 -- passser un param, la date est en timestamp car start_date est dans ce type
 SELECT CAST("2017-06-01 00:00:00" AS TIMESTAMP) as date_deb;
@@ -37,17 +41,18 @@ GROUP BY start_station_name
 ;
 
 
--- 2/      PARAMETRES 
--- syntaxe generale 
--- ne pas mettre de ' dans la requete car séparé par des 'query'
--- https://cloud.google.com/bigquery/docs/reference/bq-cli-reference#bq_query
---	--parameter=nom:TYPE:VALUE
+-- 2/    LES  PARAMETRES 
+-- syntaxe generale est --	--parameter=nom:TYPE:VALUE
 -- le type peut etre vide alors signifie STRING
 -- si param positionnel alors pas de nom
+-- ne pas mettre de ' dans la requete car séparé par des 'query'
+-- https://cloud.google.com/bigquery/docs/reference/bq-cli-reference#bq_query
 
 
 -- 3/
 -- named parameters : les paramètres sont nommés
+
+-- selon 
 bq query \
 --use_legacy_sql=false \
 --parameter=station::HYDE \

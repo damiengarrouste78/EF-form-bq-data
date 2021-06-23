@@ -8,6 +8,8 @@
 PARTIE 1 LONDON hires
 -------------
 -- flag week et matin : est ce qu'il y a plus de locations en matinée en semaine ?
+
+-- table temporaire : existe que le temps de l'exécution, doit être lancée en meme temps que l'instruction qui suit.
 create temporary table hires_wemorning as
 WITH PARAMS AS (
 SELECT CAST("2017-01-01 00:00:00" AS TIMESTAMP) as date_deb,
@@ -41,7 +43,7 @@ order by flag_weekend, flag_morning
 PARTIE  2 JEUX OLYMPIQUES
 -------------
 
-create or replace table eu_dgr.nage_jo(nageur STRING,epreuve STRING,temps FLOAT64);
+create or replace table xxx.nage_jo(nageur STRING,epreuve STRING,temps FLOAT64);
 INSERT eu_dgr.nage_jo (nageur,epreuve,temps)
 VALUES('Andriy Hovorov','50m',21.74),
 ('Anthony Ervin','50m',21.4),
@@ -66,7 +68,7 @@ VALUES('Andriy Hovorov','50m',21.74),
 SELECT 
 nageur, epreuve, temps, 
 RANK() OVER(PARTITION BY epreuve ORDER BY temps) as Rang 
-FROM eu_dgr.nage_jo 
+FROM xxx.nage_jo 
 ;
 -- percentiles 
 SELECT DISTINCT epreuve, Q1, MED, Q3

@@ -39,9 +39,9 @@
 -- EXERCICE 1
 -- Modif : Ne garder que les  commandes des clients du train set
 
--- 1/ Créer un dataset instacart
+-- 1/ Créer un dataset avec votre prénom XXX
 
--- 2/ Créer les tables à partir des fichiers stockés dans GCS (gs://epsi-tech-dsc-formation-202005/data/instacart/)
+-- 2/ Tester comment créer des tables à partir des fichiers stockés dans GCS (gs://epsi-tech-dsc-formation-202005/data/instacart/)
 	-- aisles.csv			==> instacart.aisles
 	-- departments.csv		==> instacart.departments		
 	-- products.csv			==> instacart.products
@@ -80,7 +80,7 @@ from instacart.order_products_prior as c
 inner join instacart.orders_scope as d on c.order_id = d.order_id
 ; 
 
--- on a pas de date pour partionner , on va donc faire un clustering sur id 
+-- on a pas de date pour partitionner , on va donc faire un clustering sur id 
 
 -- on peut pas passer le clustering en ui https://cloud.google.com/bigquery/docs/creating-clustered-tables#console_1
 bq query --use_legacy_sql=false \
