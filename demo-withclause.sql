@@ -7,7 +7,7 @@
 
 
 -- 1
--- WITH SOUS REQUETE
+-- WITH SOUS REQUETE dans le with
 
 create table instacart.orders_scope as 
 with sous_req as (
