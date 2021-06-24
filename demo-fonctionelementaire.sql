@@ -19,3 +19,11 @@ select SPLIT(REGEXP_REPLACE(LOWER("la formation est top, merci Damien !"),'[^a-z
 select ML.NGRAMS(SPLIT(REGEXP_REPLACE(LOWER("la formation est top, merci Damien !"),'[^a-z\\s]', ''),' ') , [2,2]) 
 -- on corrige un petit détail et voilà!
 select ML.NGRAMS(SPLIT(RTRIM(REGEXP_REPLACE(LOWER("la formation est top, merci Damien !"),'[^a-z\\s]', '')),' ') , [2,2]) 
+
+-- création d'une table
+create table eu_dgr.bigrams as
+select ML.NGRAMS(SPLIT(RTRIM(REGEXP_REPLACE(LOWER("la formation est top, merci Damien !"),'[^a-z\\s]', '')),' ') , [2,2])  as bigram
+
+-- créer des lignes par bigram
+-- unnest nest pas une focntion mais un operateur, on peut pas l'utiliser dans le select
+select bigram as test from eu_dgr.bigrams , unnest(bigram) as bigram

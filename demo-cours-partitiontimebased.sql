@@ -29,7 +29,7 @@ SELECT
 
 --2 TABLE PARTITIONNEE POUR ETRE ENSUITE REQUETEE A VOLONTE
      
-bq mk --table --schema=schema --time_partitioning_type=unit_time  project_id:dataset.table
+--bq mk --table --schema=schema --time_partitioning_type=unit_time  project_id:dataset.table
 
 bq \
 --location=EU query \

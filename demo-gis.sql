@@ -1,3 +1,4 @@
+-- Demo GIS
 SELECT
  *, ST_GeogPoint(longitude, latitude)  AS WKT 
 FROM
