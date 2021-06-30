@@ -4,16 +4,6 @@
 -- 10/2020
 --======================================================================================================================
 
--- on regarde quels mois il y a en 2017
-
-
---select EXTRACT(YEAR FROM start_date) as annee,EXTRACT(MONTH FROM start_date) as mois,count(*)
---from eu_dgr.public_london_cycle_hire
---WHERE DATE(start_date) > DATE '2017-01-01'
---where substr(cast(rental_id as string),7,2)='00'
---group by  1,2
---order by 1,2
-;
 -- 438 k lignes en juin 2017 dernier mois
 -- MODEL M1
 -- on apprend sur le dernier mois 
@@ -90,7 +80,8 @@ Cross join unnest(t0.category_weights)  as expanded
 where  expanded.weight<>0;
 
 -- MODEL M2 on écrase le précédent avec le transform
--- TRANSFORM
+-- TRANSFORM inclut le pre processing dans le modele
+-- jour de la semaine + tranche horaire sont transformées
 CREATE OR REPLACE MODEL db_public.bicycle_model_m2
 TRANSFORM(* EXCEPT(start_date),
 CAST(EXTRACT(dayofweek from start_date) AS STRING)         as dayofweek,
@@ -107,6 +98,7 @@ WHERE DATE(start_date) >  date_deb
 
 -- MODEL M3 
 -- AJOUTONS DES TRANSFORMATIONS 
+-- la fonction bucketize discrétise les tanches horaires en 4 tranches
 CREATE OR REPLACE MODEL  eu_dgr.model_bucketized
 TRANSFORM(* 
 EXCEPT(start_date)
@@ -235,7 +227,35 @@ WHERE DATE(start_date) >  date_deb
 -- Poids des variables
 SELECT * from ML.WEIGHTS(MODEL instacart.model_typetrajet2);
 
+-- Boosting (attention, cela peut etre long)
+CREATE OR REPLACE MODEL eu_dgr.model_typetrajet4
+ TRANSFORM(* EXCEPT(start_date,latitude,longitude)
+       , ML.FEATURE_CROSS(STRUCT(
+           IF(EXTRACT(dayofweek FROM start_date) BETWEEN 2 and 6, 
+              'weekday', 'weekend') as dayofweek, 
+           ML.BUCKETIZE(EXTRACT(HOUR FROM start_date), 
+              [5, 10, 17]) AS hr
+         )) AS dayhr
+       , ST_GeoHash(ST_GeogPoint(latitude, longitude), 2) AS start_station_loc2
+       , ST_GeoHash(ST_GeogPoint(latitude, longitude), 4) AS start_station_loc4
+       , ST_GeoHash(ST_GeogPoint(latitude, longitude), 6) AS start_station_loc6
+)
+OPTIONS(input_label_cols=['type_trajet'],model_type='BOOSTED_TREE_CLASSIFIER',DATA_SPLIT_METHOD = 'RANDOM' ,DATA_SPLIT_EVAL_FRACTION = 0.9,
+COLSAMPLE_BYNODE =10,
+NUM_PARALLEL_TREE = 1, LEARN_RATE=0.1,
+EARLY_STOP = TRUE,MAX_ITERATIONS=50,l1_reg=0,l2_reg=0,
+ TREE_METHOD = 'HIST',SUBSAMPLE = 0.5,MIN_TREE_CHILD_WEIGHT=50,MAX_TREE_DEPTH =5
+)
+AS SELECT   
+IF(duration>1800,'long','court') as type_trajet, latitude   , longitude   , start_date
+FROM eu_dgr.public_london_cycle_hire as cycle_hire
+JOIN `bigquery-public-data`.london_bicycles.cycle_stations
+ON cycle_hire.start_station_id = cycle_stations.id
+WHERE DATE(start_date) >  date_deb 
+;
 
+
+-- Random Forest (boosting avec 1 seule itération)
 CREATE OR REPLACE MODEL eu_dgr.model_typetrajet3
  TRANSFORM(* EXCEPT(start_date,latitude,longitude)
        , ML.FEATURE_CROSS(STRUCT(
@@ -252,7 +272,7 @@ OPTIONS(input_label_cols=['type_trajet'],model_type='BOOSTED_TREE_CLASSIFIER',DA
 COLSAMPLE_BYNODE =10,
 NUM_PARALLEL_TREE = 100, 
 EARLY_STOP = TRUE,MAX_ITERATIONS=1,l1_reg=0,l2_reg=0
- TREE_METHOD = 'HIST',SUBSAMPLE = 0.67,MIN_TREE_CHILD_WEIGHT=30,MAX_TREE_DEPTH =8
+ TREE_METHOD = 'HIST',SUBSAMPLE = 0.67,MIN_TREE_CHILD_WEIGHT=50,MAX_TREE_DEPTH =8
 )
 AS SELECT   
 IF(duration>1800,'long','court') as type_trajet, latitude   , longitude   , start_date
